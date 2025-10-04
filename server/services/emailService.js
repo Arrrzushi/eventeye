@@ -10,7 +10,7 @@ class EmailService {
 
   async initializeTransporter() {
     try {
-      this.transporter = nodemailer.createTransporter({
+      this.transporter = nodemailer.createTransport({
         host: process.env.EMAIL_HOST || 'smtp.gmail.com',
         port: process.env.EMAIL_PORT || 587,
         secure: false,
@@ -53,7 +53,7 @@ class EmailService {
         html: htmlContent,
         attachments: [
           {
-            filename: `Certificate_${name.replace(/\s+/g, '_')}.png`,
+            filename: `Certificate_${name.replace(/\s+/g, '_')}.pdf`,
             path: certificatePath,
             cid: 'certificate'
           }

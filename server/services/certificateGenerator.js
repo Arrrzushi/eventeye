@@ -1,8 +1,8 @@
-const { createCanvas, loadImage, registerFont } = require('canvas');
 const QRCode = require('qrcode');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs').promises;
+const jsPDF = require('jspdf');
 
 class CertificateGenerator {
   constructor() {
@@ -22,18 +22,19 @@ class CertificateGenerator {
     try {
       const { participantName, eventTitle, eventDate, organizerName, location, certificateNumber } = certificateData;
       
-      // Create canvas
-      const canvas = createCanvas(1200, 800);
-      const ctx = canvas.getContext('2d');
+      // Create PDF document
+      const doc = new jsPDF('landscape', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
 
       // Set background
-      await this.setBackground(ctx, canvas, template);
+      this.setBackground(doc, pageWidth, pageHeight, template);
 
       // Generate QR code
       const qrCodeData = await this.generateQRCode(certificateData);
       
       // Draw certificate content
-      await this.drawCertificateContent(ctx, {
+      await this.drawCertificateContent(doc, {
         participantName,
         eventTitle,
         eventDate,
@@ -41,15 +42,15 @@ class CertificateGenerator {
         location,
         certificateNumber,
         qrCodeData
-      }, template);
+      }, pageWidth, pageHeight, template);
 
       // Save certificate
       const certificateId = uuidv4();
-      const fileName = `certificate_${certificateId}.png`;
+      const fileName = `certificate_${certificateId}.pdf`;
       const filePath = path.join(__dirname, '../uploads/certificates', fileName);
       
-      const buffer = canvas.toBuffer('image/png');
-      await fs.writeFile(filePath, buffer);
+      const pdfBuffer = doc.output('arraybuffer');
+      await fs.writeFile(filePath, Buffer.from(pdfBuffer));
 
       return {
         certificateId,
@@ -63,87 +64,81 @@ class CertificateGenerator {
     }
   }
 
-  async setBackground(ctx, canvas, template) {
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  setBackground(doc, pageWidth, pageHeight, template) {
+    let bgColor;
     
     switch (template) {
       case 'modern':
-        gradient.addColorStop(0, '#667eea');
-        gradient.addColorStop(1, '#764ba2');
+        bgColor = '#667eea';
         break;
       case 'minimal':
-        gradient.addColorStop(0, '#f8fafc');
-        gradient.addColorStop(1, '#e2e8f0');
+        bgColor = '#f8fafc';
         break;
       default: // classic
-        gradient.addColorStop(0, '#1e3a8a');
-        gradient.addColorStop(1, '#3b82f6');
+        bgColor = '#1e3a8a';
     }
     
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Set background color
+    doc.setFillColor(bgColor);
+    doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
     // Add border
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 8;
-    ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(3);
+    doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
   }
 
-  async drawCertificateContent(ctx, data, template) {
+  async drawCertificateContent(doc, data, pageWidth, pageHeight, template) {
     const { participantName, eventTitle, eventDate, organizerName, location, certificateNumber, qrCodeData } = data;
     
-    // Set text properties
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
     // Title
-    ctx.font = 'bold 48px Arial';
-    ctx.fillText('CERTIFICATE OF PARTICIPATION', 600, 120);
+    doc.setFontSize(24);
+    doc.setTextColor(255, 255, 255);
+    doc.text('CERTIFICATE OF PARTICIPATION', pageWidth / 2, 40, { align: 'center' });
 
     // Participant name
-    ctx.font = 'bold 36px Arial';
-    ctx.fillText(`This is to certify that`, 600, 200);
+    doc.setFontSize(16);
+    doc.text(`This is to certify that`, pageWidth / 2, 70, { align: 'center' });
     
-    ctx.font = 'bold 42px Arial';
-    ctx.fillStyle = '#fbbf24';
-    ctx.fillText(participantName, 600, 260);
+    doc.setFontSize(20);
+    doc.setTextColor(251, 191, 36); // Gold color
+    doc.text(participantName, pageWidth / 2, 90, { align: 'center' });
     
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 28px Arial';
-    ctx.fillText('has successfully participated in', 600, 320);
+    doc.setFontSize(14);
+    doc.setTextColor(255, 255, 255);
+    doc.text('has successfully participated in', pageWidth / 2, 110, { align: 'center' });
 
     // Event details
-    ctx.font = 'bold 32px Arial';
-    ctx.fillStyle = '#fbbf24';
-    ctx.fillText(eventTitle, 600, 380);
+    doc.setFontSize(18);
+    doc.setTextColor(251, 191, 36);
+    doc.text(eventTitle, pageWidth / 2, 130, { align: 'center' });
     
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '24px Arial';
-    ctx.fillText(`held on ${new Date(eventDate).toLocaleDateString()}`, 600, 420);
-    ctx.fillText(`at ${location}`, 600, 450);
+    doc.setFontSize(12);
+    doc.setTextColor(255, 255, 255);
+    doc.text(`held on ${new Date(eventDate).toLocaleDateString()}`, pageWidth / 2, 150, { align: 'center' });
+    doc.text(`at ${location}`, pageWidth / 2, 165, { align: 'center' });
 
     // Organizer
-    ctx.font = '20px Arial';
-    ctx.fillText(`Organized by: ${organizerName}`, 600, 520);
+    doc.setFontSize(10);
+    doc.text(`Organized by: ${organizerName}`, pageWidth / 2, 190, { align: 'center' });
 
     // Certificate number
-    ctx.font = '16px Arial';
-    ctx.fillText(`Certificate No: ${certificateNumber}`, 600, 580);
+    doc.setFontSize(8);
+    doc.text(`Certificate No: ${certificateNumber}`, pageWidth / 2, 205, { align: 'center' });
 
     // Date
-    ctx.fillText(`Issued on: ${new Date().toLocaleDateString()}`, 600, 610);
+    doc.text(`Issued on: ${new Date().toLocaleDateString()}`, pageWidth / 2, 215, { align: 'center' });
 
     // QR Code
     if (qrCodeData) {
-      await this.drawQRCode(ctx, qrCodeData, 100, 650);
+      await this.drawQRCode(doc, qrCodeData, 20, pageHeight - 40);
     }
   }
 
-  async drawQRCode(ctx, qrCodeData, x, y) {
+  async drawQRCode(doc, qrCodeData, x, y) {
     try {
-      const qrCodeImage = await QRCode.toDataURL(qrCodeData, {
-        width: 100,
+      const qrCodeDataURL = await QRCode.toDataURL(qrCodeData, {
+        width: 50,
         margin: 1,
         color: {
           dark: '#000000',
@@ -151,11 +146,8 @@ class CertificateGenerator {
         }
       });
 
-      const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, x, y, 100, 100);
-      };
-      img.src = qrCodeImage;
+      // Add QR code to PDF
+      doc.addImage(qrCodeDataURL, 'PNG', x, y, 30, 30);
     } catch (error) {
       console.error('QR Code drawing error:', error);
     }

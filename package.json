@@ -4,16 +4,28 @@
   "description": "EventEye - Automated Certificate Distribution Platform for Events",
   "main": "server/index.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "cd server && npm run dev",
     "server": "cd server && npm run dev",
-    "client": "cd client && npm start",
-    "build": "cd client && npm run build",
-    "install-all": "npm install && cd server && npm install && cd ../client && npm install"
+    "install-all": "npm install && cd server && npm install",
+    "setup": "node setup-env.js",
+    "start": "cd server && npm run dev",
+    "dashboard": "start index.html",
+    "create-event": "start create-event.html",
+    "production": "node start-production.js"
   },
-  "keywords": ["certificates", "events", "automation", "qr-codes", "bulk-email"],
+  "keywords": [
+    "certificates",
+    "events",
+    "automation",
+    "qr-codes",
+    "bulk-email"
+  ],
   "author": "EventEye Team",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "open": "^10.2.0"
   }
 }

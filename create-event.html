@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event - EventEye</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --surface-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header */
+        .header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .back-btn {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            background: var(--surface);
+        }
+
+        /* Main Layout */
+        .main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Card */
+        .card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: var(--background);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Participants */
+        .participants-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .participant-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .participant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .participant-number {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .remove-participant {
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .remove-participant:hover {
+            background: #dc2626;
+        }
+
+        .add-participant {
+            background: var(--surface);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .add-participant:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-hover);
+            border-color: var(--primary-light);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .notification.error {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🎓</div>
+                EventEye
+            </div>
+            <a href="index.html" class="back-btn">← Back to Dashboard</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="page-header">
+            <h1 class="page-title">Create New Event</h1>
+            <p class="page-subtitle">Set up your event and manage participants for certificate automation</p>
+        </div>
+
+        <div class="card">
+            <form id="eventForm">
+                <!-- Event Details -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Event Title *</label>
+                        <input type="text" class="form-input" id="eventTitle" placeholder="Enter event title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Event Date *</label>
+                        <input type="date" class="form-input" id="eventDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Location *</label>
+                        <input type="text" class="form-input" id="eventLocation" placeholder="Enter event location" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Event Type *</label>
+                        <select class="form-select" id="eventType" required>
+                            <option value="">Select event type</option>
+                            <option value="free">Free Event</option>
+                            <option value="paid">Paid Event</option>
+                            <option value="workshop">Workshop</option>
+                            <option value="conference">Conference</option>
+                            <option value="seminar">Seminar</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Max Participants</label>
+                        <input type="number" class="form-input" id="maxParticipants" placeholder="100" min="1" max="10000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Organizer Name *</label>
+                        <input type="text" class="form-input" id="organizerName" placeholder="Enter organizer name" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Event Description *</label>
+                    <textarea class="form-textarea" id="eventDescription" placeholder="Describe your event, topics covered, and what participants will learn..." required></textarea>
+                </div>
+
+                <!-- Participants Section -->
+                <div class="participants-section">
+                    <h2 class="section-title">👥 Participants</h2>
+                    <div id="participantsList">
+                        <!-- Participants will be added here -->
+                    </div>
+                    
+                    <div class="add-participant" onclick="addParticipant()">
+                        ➕ Add Participant
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="saveDraft()">💾 Save Draft</button>
+                    <button type="button" class="btn btn-primary" onclick="previewEvent()">👁️ Preview</button>
+                    <button type="submit" class="btn btn-success" onclick="createEvent(event)">
+                        🚀 Create Event & Generate Certificates
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        let participantCount = 0;
+
+        // Initialize form
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date as default
+            document.getElementById('eventDate').value = new Date().toISOString().split('T')[0];
+            
+            // Add first participant
+            addParticipant();
+        });
+
+        // Add participant
+        function addParticipant() {
+            participantCount++;
+            const participantsList = document.getElementById('participantsList');
+            const participantDiv = document.createElement('div');
+            participantDiv.className = 'participant-item';
+            participantDiv.innerHTML = `
+                <div class="participant-header">
+                    <div class="participant-number">Participant ${participantCount}</div>
+                    <button type="button" class="remove-participant" onclick="removeParticipant(this)" ${participantCount === 1 ? 'disabled' : ''}>🗑️</button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" class="form-input participant-name" placeholder="Enter full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <input type="email" class="form-input participant-email" placeholder="Enter email address" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-input participant-phone" placeholder="+1234567890">
+                    </div>
+                </div>
+            `;
+            participantsList.appendChild(participantDiv);
+        }
+
+        // Remove participant
+        function removeParticipant(button) {
+            if (participantCount > 1) {
+                button.closest('.participant-item').remove();
+                participantCount--;
+                updateParticipantNumbers();
+            }
+        }
+
+        // Update participant numbers
+        function updateParticipantNumbers() {
+            const participants = document.querySelectorAll('.participant-number');
+            participants.forEach((number, index) => {
+                number.textContent = `Participant ${index + 1}`;
+            });
+        }
+
+        // Get participants data
+        function getParticipants() {
+            const participants = [];
+            document.querySelectorAll('.participant-item').forEach(item => {
+                const name = item.querySelector('.participant-name').value.trim();
+                const email = item.querySelector('.participant-email').value.trim();
+                const phone = item.querySelector('.participant-phone').value.trim();
+                
+                if (name && email) {
+                    participants.push({ name, email, phone });
+                }
+            });
+            return participants;
+        }
+
+        // Validate form
+        function validateForm() {
+            const requiredFields = ['eventTitle', 'eventDate', 'eventLocation', 'eventType', 'organizerName', 'eventDescription'];
+            const participants = getParticipants();
+            
+            for (const field of requiredFields) {
+                const input = document.getElementById(field);
+                if (!input.value.trim()) {
+                    showNotification(`Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`, 'error');
+                    input.focus();
+                    return false;
+                }
+            }
+            
+            if (participants.length === 0) {
+                showNotification('Please add at least one participant', 'error');
+                return false;
+            }
+            
+            // Validate email addresses
+            for (const participant of participants) {
+                if (!isValidEmail(participant.email)) {
+                    showNotification(`Invalid email address: ${participant.email}`, 'error');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Create event
+        async function createEvent(event) {
+            if (event) event.preventDefault();
+            
+            if (!validateForm()) return;
+            
+            const formData = {
+                title: document.getElementById('eventTitle').value,
+                description: document.getElementById('eventDescription').value,
+                eventDate: document.getElementById('eventDate').value,
+                location: document.getElementById('eventLocation').value,
+                type: document.getElementById('eventType').value,
+                maxParticipants: parseInt(document.getElementById('maxParticipants').value) || 100,
+                organizerName: document.getElementById('organizerName').value
+            };
+            
+            const participants = getParticipants();
+            
+            try {
+                showNotification('Creating event...', 'success');
+                
+                // Create event
+                const eventResponse = await fetch('http://localhost:5000/api/events', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!eventResponse.ok) {
+                    throw new Error(`Event creation failed: ${eventResponse.status}`);
+                }
+                
+                const eventResult = await eventResponse.json();
+                const eventId = eventResult.data.event._id;
+                
+                showNotification('Event created successfully! Adding participants...', 'success');
+                
+                // Add participants
+                const participantsResponse = await fetch(`http://localhost:5000/api/events/${eventId}/participants`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ participants })
+                });
+                
+                if (participantsResponse.ok) {
+                    showNotification('Participants added successfully! Generating certificates...', 'success');
+                }
+                
+                // Generate certificates
+                const certResponse = await fetch(`http://localhost:5000/api/certificates/generate/${eventId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (certResponse.ok) {
+                    const certResult = await certResponse.json();
+                    showNotification(`🎉 Event created successfully! Generated ${certResult.data.certificatesGenerated} certificates.`, 'success');
+                    
+                    // Redirect to dashboard after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showNotification('Event created but certificate generation failed', 'error');
+                }
+                
+            } catch (error) {
+                showNotification(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Save draft
+        function saveDraft() {
+            showNotification('Draft saved successfully!', 'success');
+        }
+
+        // Preview event
+        function previewEvent() {
+            if (!validateForm()) return;
+            
+            const formData = {
+                title: document.getElementById('eventTitle').value,
+                description: document.getElementById('eventDescription').value,
+                eventDate: document.getElementById('eventDate').value,
+                location: document.getElementById('eventLocation').value,
+                type: document.getElementById('eventType').value,
+                organizerName: document.getElementById('organizerName').value
+            };
+            
+            const participants = getParticipants();
+            
+            // Create preview modal (simplified)
+            const preview = `
+                Event: ${formData.title}
+                Date: ${new Date(formData.eventDate).toLocaleDateString()}
+                Location: ${formData.location}
+                Type: ${formData.type}
+                Organizer: ${formData.organizerName}
+                Participants: ${participants.length}
+            `;
+            
+            alert('Event Preview:\n\n' + preview);
+        }
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

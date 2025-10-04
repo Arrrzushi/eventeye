@@ -367,7 +367,7 @@ router.get('/download/:certificateId', async (req, res) => {
       });
     }
 
-    res.download(certificate.filePath, `Certificate_${certificate.participant.name.replace(/\s+/g, '_')}.png`);
+    res.download(certificate.filePath, `Certificate_${certificate.participant.name.replace(/\s+/g, '_')}.pdf`);
   } catch (error) {
     console.error('Certificate download error:', error);
     res.status(500).json({

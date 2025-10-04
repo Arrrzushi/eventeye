@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventEye - Certificate Automation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --surface-hover: #f1f5f9;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header */
+        .header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+            background: var(--surface);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        /* Main Layout */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        /* Stats */
+        .stat {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .stat-change {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            color: var(--error);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-hover);
+            border-color: var(--primary-light);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: var(--background);
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table th {
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--surface);
+        }
+
+        .table td {
+            color: var(--text-secondary);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .badge-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+
+        .badge-secondary {
+            background: var(--surface);
+            color: var(--text-secondary);
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .notification.error {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .nav {
+                display: none;
+            }
+            
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🎓</div>
+                EventEye
+            </div>
+            <nav class="nav">
+                <a href="#dashboard" class="nav-link active" onclick="showTab('dashboard')">Dashboard</a>
+                <a href="#events" class="nav-link" onclick="showTab('events')">Events</a>
+                <a href="#certificates" class="nav-link" onclick="showTab('certificates')">Certificates</a>
+                <a href="#settings" class="nav-link" onclick="showTab('settings')">Settings</a>
+            </nav>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                <span>System Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content active">
+            <div class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Overview of your certificate automation system</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-4">
+                <div class="card stat">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value" id="totalEvents">0</div>
+                    <div class="stat-label">Total Events</div>
+                    <div class="stat-change positive">+12% this month</div>
+                </div>
+                <div class="card stat">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value" id="totalParticipants">0</div>
+                    <div class="stat-label">Participants</div>
+                    <div class="stat-change positive">+28% this month</div>
+                </div>
+                <div class="card stat">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-value" id="totalCertificates">0</div>
+                    <div class="stat-label">Certificates</div>
+                    <div class="stat-change positive">+35% this month</div>
+                </div>
+                <div class="card stat">
+                    <div class="stat-icon">📧</div>
+                    <div class="stat-value" id="deliveryRate">0%</div>
+                    <div class="stat-label">Delivery Rate</div>
+                    <div class="stat-change positive">+5% this month</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-2" style="margin-top: 2rem;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Certificate Generation Trend</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="certificateChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Delivery Status</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="deliveryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Tab -->
+        <div id="events-tab" class="tab-content">
+            <div class="page-header">
+                <h1 class="page-title">Events</h1>
+                <p class="page-subtitle">Manage your events and participants</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Event Management</h3>
+                    <button class="btn btn-primary" onclick="createEvent()">+ Create Event</button>
+                </div>
+                <div id="eventsList">
+                    <!-- Events will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificates Tab -->
+        <div id="certificates-tab" class="tab-content">
+            <div class="page-header">
+                <h1 class="page-title">Certificates</h1>
+                <p class="page-subtitle">Track and manage certificate delivery</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Certificate Management</h3>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary btn-sm" onclick="refreshCertificates()">🔄 Refresh</button>
+                        <button class="btn btn-success btn-sm" onclick="sendBulkCertificates()">📤 Send All</button>
+                    </div>
+                </div>
+                <div id="certificatesList">
+                    <!-- Certificates will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings-tab" class="tab-content">
+            <div class="page-header">
+                <h1 class="page-title">Settings</h1>
+                <p class="page-subtitle">Configure your system settings</p>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Email Configuration</h3>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Gmail Address</label>
+                        <input type="email" class="form-input" id="emailUser" placeholder="your-email@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">App Password</label>
+                        <input type="password" class="form-input" id="emailPass" placeholder="16-character app password">
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" onclick="testEmail()">📧 Test Email</button>
+                        <button class="btn btn-secondary" onclick="saveEmailSettings()">💾 Save</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">WhatsApp Configuration</h3>
+                    </div>
+                    <div id="whatsappStatus">
+                        <div class="status-badge" style="margin-bottom: 1rem;">
+                            <div class="status-dot" id="whatsappDot"></div>
+                            <span id="whatsappStatusText">Checking status...</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" onclick="initializeWhatsApp()" id="whatsappInitBtn">🚀 Initialize</button>
+                        <button class="btn btn-secondary" onclick="checkWhatsAppStatus()">📊 Check Status</button>
+                    </div>
+                    <div id="whatsappQR" class="hidden" style="margin-top: 1rem; text-align: center;">
+                        <div style="background: white; padding: 1rem; border-radius: var(--radius); display: inline-block;">
+                            <pre id="qrCodeDisplay" style="font-size: 0.7rem; line-height: 1;"></pre>
+                        </div>
+                        <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+                            Scan this QR code with WhatsApp to connect
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Global variables
+        let charts = {};
+        let currentTab = 'dashboard';
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        // Initialize application
+        function initializeApp() {
+            loadDashboardData();
+            setupCharts();
+            checkWhatsAppStatus();
+            
+            // Auto-refresh data every 30 seconds
+            setInterval(loadDashboardData, 30000);
+        }
+
+        // Tab switching
+        function showTab(tabName) {
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show tab content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            currentTab = tabName;
+
+            // Load tab-specific data
+            if (tabName === 'events') loadEvents();
+            if (tabName === 'certificates') loadCertificates();
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('http://localhost:5000/api/dashboard/stats');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStats(data.data.overview);
+                }
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+            }
+        }
+
+        // Update statistics
+        function updateStats(stats) {
+            document.getElementById('totalEvents').textContent = stats.totalEvents || 0;
+            document.getElementById('totalParticipants').textContent = stats.totalParticipants || 0;
+            document.getElementById('totalCertificates').textContent = stats.totalCertificates || 0;
+            document.getElementById('deliveryRate').textContent = (stats.deliveryRate || 0) + '%';
+        }
+
+        // Setup charts
+        function setupCharts() {
+            setupCertificateChart();
+            setupDeliveryChart();
+        }
+
+        // Certificate generation trend chart
+        function setupCertificateChart() {
+            const ctx = document.getElementById('certificateChart').getContext('2d');
+            charts.certificate = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Certificates Generated',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#f1f5f9'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Delivery status chart
+        function setupDeliveryChart() {
+            const ctx = document.getElementById('deliveryChart').getContext('2d');
+            charts.delivery = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Delivered', 'Sent', 'Pending', 'Failed'],
+                    datasets: [{
+                        data: [65, 20, 10, 5],
+                        backgroundColor: [
+                            '#10b981',
+                            '#2563eb',
+                            '#f59e0b',
+                            '#ef4444'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load events
+        async function loadEvents() {
+            try {
+                const response = await fetch('http://localhost:5000/api/events');
+                if (response.ok) {
+                    const data = await response.json();
+                    displayEvents(data.data || []);
+                }
+            } catch (error) {
+                console.error('Failed to load events:', error);
+            }
+        }
+
+        // Display events
+        function displayEvents(events) {
+            const container = document.getElementById('eventsList');
+            if (events.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">No events found</p>';
+                return;
+            }
+
+            container.innerHTML = events.map(event => `
+                <div style="padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">${event.title}</h4>
+                            <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">${event.description}</p>
+                            <div style="display: flex; gap: 1rem; font-size: 0.875rem; color: var(--text-muted);">
+                                <span>📅 ${new Date(event.eventDate).toLocaleDateString()}</span>
+                                <span>📍 ${event.location}</span>
+                                <span>👥 ${event.participants.length} participants</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-secondary btn-sm" onclick="viewEvent('${event._id}')">👁️ View</button>
+                            <button class="btn btn-primary btn-sm" onclick="generateCertificates('${event._id}')">🏆 Generate</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load certificates
+        async function loadCertificates() {
+            try {
+                const response = await fetch('http://localhost:5000/api/certificates');
+                if (response.ok) {
+                    const data = await response.json();
+                    displayCertificates(data.data || []);
+                }
+            } catch (error) {
+                console.error('Failed to load certificates:', error);
+            }
+        }
+
+        // Display certificates
+        function displayCertificates(certificates) {
+            const container = document.getElementById('certificatesList');
+            if (certificates.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">No certificates found</p>';
+                return;
+            }
+
+            container.innerHTML = certificates.map(cert => `
+                <div style="padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">${cert.participant.name}</h4>
+                            <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">${cert.participant.email}</p>
+                            <div style="display: flex; gap: 1rem; align-items: center;">
+                                <span class="badge badge-secondary">🏆 ${cert.certificateId}</span>
+                                <span class="badge ${getStatusBadgeClass(cert.status)}">${cert.status}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-secondary btn-sm" onclick="downloadCertificate('${cert.certificateId}')">📥 Download</button>
+                            <button class="btn btn-primary btn-sm" onclick="sendCertificate('${cert.certificateId}')">📤 Send</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get status badge class
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'delivered': return 'badge-success';
+                case 'sent': return 'badge-secondary';
+                case 'pending': return 'badge-warning';
+                case 'failed': return 'badge-error';
+                default: return 'badge-secondary';
+            }
+        }
+
+        // WhatsApp functions
+        async function checkWhatsAppStatus() {
+            try {
+                const response = await fetch('http://localhost:5000/api/whatsapp/status');
+                const result = await response.json();
+                
+                if (result.success && result.whatsapp) {
+                    updateWhatsAppStatus(result.whatsapp);
+                }
+            } catch (error) {
+                console.error('Failed to check WhatsApp status:', error);
+            }
+        }
+
+        function updateWhatsAppStatus(status) {
+            const dot = document.getElementById('whatsappDot');
+            const text = document.getElementById('whatsappStatusText');
+            const qrSection = document.getElementById('whatsappQR');
+            const qrDisplay = document.getElementById('qrCodeDisplay');
+            const initBtn = document.getElementById('whatsappInitBtn');
+
+            if (status.ready) {
+                dot.style.background = 'var(--success)';
+                text.textContent = 'Connected and ready';
+                qrSection.classList.add('hidden');
+                initBtn.textContent = '✅ Connected';
+                initBtn.disabled = true;
+            } else if (status.qrCode) {
+                dot.style.background = 'var(--warning)';
+                text.textContent = 'Waiting for QR scan';
+                qrSection.classList.remove('hidden');
+                qrDisplay.textContent = status.qrCode;
+                initBtn.textContent = '🔄 Connecting...';
+                initBtn.disabled = true;
+            } else {
+                dot.style.background = 'var(--error)';
+                text.textContent = 'Not connected';
+                qrSection.classList.add('hidden');
+                initBtn.textContent = '🚀 Initialize';
+                initBtn.disabled = false;
+            }
+        }
+
+        async function initializeWhatsApp() {
+            try {
+                const response = await fetch('http://localhost:5000/api/whatsapp/initialize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification('WhatsApp service initialized successfully!', 'success');
+                    setTimeout(checkWhatsAppStatus, 2000);
+                } else {
+                    showNotification(`Failed to initialize: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Action functions
+        function createEvent() {
+            showNotification('Opening event creator...', 'success');
+            window.open('event-creator.html', '_blank');
+        }
+
+        function generateCertificates(eventId) {
+            showNotification('Generating certificates...', 'success');
+            // Implementation for generating certificates
+        }
+
+        function sendBulkCertificates() {
+            showNotification('Sending certificates in bulk...', 'success');
+            // Implementation for bulk sending
+        }
+
+        function testEmail() {
+            const email = document.getElementById('emailUser').value;
+            if (!email) {
+                showNotification('Please enter an email address', 'error');
+                return;
+            }
+            showNotification('Testing email configuration...', 'success');
+            // Implementation for testing email
+        }
+
+        function saveEmailSettings() {
+            showNotification('Email settings saved successfully!', 'success');
+            // Implementation for saving settings
+        }
+
+        function viewEvent(eventId) {
+            showNotification('Opening event details...', 'success');
+            // Implementation for viewing event
+        }
+
+        function downloadCertificate(certificateId) {
+            showNotification('Downloading certificate...', 'success');
+            // Implementation for downloading certificate
+        }
+
+        function sendCertificate(certificateId) {
+            showNotification('Sending certificate...', 'success');
+            // Implementation for sending certificate
+        }
+
+        function refreshCertificates() {
+            loadCertificates();
+            showNotification('Certificates refreshed', 'success');
+        }
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -14,6 +14,7 @@ const eventRoutes = require('./routes/events');
 const certificateRoutes = require('./routes/certificates');
 const emailRoutes = require('./routes/email');
 const dashboardRoutes = require('./routes/dashboard');
+const whatsappRoutes = require('./routes/whatsapp');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -31,7 +32,11 @@ app.use(limiter);
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: [
+    process.env.CLIENT_URL || 'http://localhost:3000',
+    'file://', // Allow local HTML files
+    'null' // Allow local HTML files
+  ],
   credentials: true
 }));
 
@@ -45,6 +50,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/certificates', certificateRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -6,8 +6,8 @@ const router = express.Router();
 
 // @route   POST /api/email/test
 // @desc    Send a test email to verify email configuration
-// @access  Private
-router.post('/test', auth, async (req, res) => {
+// @access  Public
+router.post('/test', async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -138,8 +138,8 @@ router.post('/bulk', auth, async (req, res) => {
 
 // @route   GET /api/email/status
 // @desc    Get email service status
-// @access  Private
-router.get('/status', auth, async (req, res) => {
+// @access  Public
+router.get('/status', async (req, res) => {
   try {
     // Check if email service is configured
     const isConfigured = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
